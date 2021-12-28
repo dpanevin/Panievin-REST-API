@@ -8,7 +8,7 @@ const remove = async (id) => {
   );
 
   if (contacts.length === newContacts.length) {
-    return "Нет контакта с таким ID";
+    return null;
   }
 
   await updateContacts(newContacts);
