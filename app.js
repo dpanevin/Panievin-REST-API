@@ -1,25 +1,28 @@
-const express = require('express')
-const logger = require('morgan')
-const cors = require('cors')
+const express = require("express");
+const moment = require("moment");
+const fs = require("fs/promises");
+const cors = require("cors");
 
-const contactsRouter = require('./routes/api/contacts')
+const contactsRouter = require("./routes/api/contacts");
 
-const app = express()
+const app = express();
 
-const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
+app.use(cors());
 
-app.use(logger(formatsLogger))
-app.use(cors())
-app.use(express.json())
+app.use(async (req, res, next) => {
+  const { method, url } = req;
+  const date = moment().format("DD-MM-YYYY_hh:mm:ss");
+  const str = `${method} ${url} ${date}\n`;
 
-app.use('/api/contacts', contactsRouter)
+  await fs.appendFile("server.log", str);
+
+  next();
+});
+
+app.use("/contacts", contactsRouter);
 
 app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' })
-})
+  res.status(404).json({ message: "Not found" });
+});
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message })
-})
-
-module.exports = app
+module.exports = app;
