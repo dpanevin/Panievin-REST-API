@@ -93,9 +93,14 @@ router.put("/:id", async (req, res, next) => {
   const body = req.body;
 
   try {
+    if (Object.keys(req.body).length === 0) {
+      throw new BadRequest("Missing fields");
+    }
+
     const { error } = joiSchemaPut.validate(body);
 
     if (error) {
+      console.log(error.message);
       throw new BadRequest(error.message);
     }
 
